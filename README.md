@@ -1,8 +1,7 @@
-# Trabalho Prático 2  
-# Pesquisa Operacional (DCC035) - TZ 2025/1  
-## DCC/UFMG  
-## Aluno: Arthur Guimarães Ferreira  
-## Professor: Marcio Costa Santos  
+# Trabalho Prático 2 - Pesquisa Operacional (DCC035) - TZ 2025/1  
+ **DCC/UFMG  
+ Aluno: Arthur Guimarães Ferreira  
+ Professor: Marcio Costa Santos**
 
 Este projeto implementa o **Algoritmo Simplex** utilizando o método **BIG-M** em linguagem C, com foco em desempenho para resolver problemas de Programação Linear no formato:
 
