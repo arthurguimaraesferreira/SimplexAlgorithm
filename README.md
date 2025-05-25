@@ -7,17 +7,13 @@ Professor: Marcio Costa Santos**
 Este projeto implementa o Algoritmo Simplex utilizando o método BIG-M em linguagem C, com foco em desempenho para resolver problemas de Programação Linear no formato:
 
 max c^t x
-
 st. Ax = b 
-
     x >= 0
 
 Alguns exemplos de execução se encontram na pasta 'Examples' e o enunciado do trabalho prático está no PDF.
 
 Seguindo as orientações do enunciado, o programa deve ser compilado e executado com:
-
 *gcc -m64 -O3 FastSimplexBIGM.c -o FastSimplexBIGM*
-
 *./FastSimplexBIGM < ./Examples/example01.txt*
 
 
