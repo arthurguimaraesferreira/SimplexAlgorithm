@@ -1,5 +1,6 @@
 # Trabalho Prático 2 - Pesquisa Operacional (DCC035) - TZ 2025/1  
- **DCC/UFMG  
+ **Departamento de Ciência da Computação (DCC)  
+ Universidade Federal de Minas Gerais (UFMG)  
  Aluno: Arthur Guimarães Ferreira  
  Professor: Marcio Costa Santos**
 

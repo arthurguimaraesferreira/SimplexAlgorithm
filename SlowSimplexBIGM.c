@@ -2,7 +2,6 @@
 // Pesquisa Operacional (DCC035) - TZ 2025/1
 // DCC/UFMG
 // Aluno: Arthur Guimarães Ferreira
-// Matrícula: 2023034781
 // Professor: Marcio Costa Santos
 
 // Algoritmo Simplex para resolver problemas do tipo:

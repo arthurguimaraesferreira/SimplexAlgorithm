@@ -2,7 +2,6 @@
 // Pesquisa Operacional (DCC035) - TZ 2025/1
 // DCC/UFMG
 // Aluno: Arthur Guimarães Ferreira
-// Matrícula: 2023034781
 // Professor: Marcio Costa Santos
 
 // Algoritmo Simplex para resolver problemas do tipo:
@@ -10,7 +9,7 @@
 // st. Ax = b
 //     x >= 0
 
-// Método BigM de *minimização*:
+// Método Big-M de *minimização*:
 // para resolver o problema de maximização
 // com esse algoritmo, fazemos a transformação abaixo.
 
@@ -26,7 +25,7 @@
 // Nesta implementação, o objetivo é fazer o Simplex
 // que rode O MAIS RÁPIDO POSSÍVEL!
 // Uma versão mais lenta, porém mais simples do
-// código se encontra em: 
+// código se encontra em: https://github.com/arthurguimaraesferreira/SimplexAlgorithm
 // Esta versão com foco em baixo tempo de execução foi
 // melhorada a partir da versão acima.
 
@@ -104,7 +103,7 @@ int main() {
     }
 
     // 0. Calcula o primeiro custo reduzido. Os próximos são calculados
-    //    dentro do loop do Simplex, pela linha tableau[0][k], 0 <= k < c-1
+    //    dentro do loop do Simplex, pela linha tableau[0][k], 0 <= k < c
     for (int k = 0; k < c; k++) {
         for (int i = 1; i < l; i++) {
             Z[k] = Z[k] + (C[variaveis_base[i-1]] * tableau(i, k));
@@ -118,23 +117,32 @@ int main() {
         // 1. Definir Coluna Pivô
         int col_pivo = -1;
         double maior_custo_reduzido = 0.0;
-        for (int j = 0; j < c-1; j++) {
-            if (tableau(0, j) > maior_custo_reduzido) {
-                maior_custo_reduzido = tableau(0, j);
+        double *row0 = &tableau(0, 0);
+        int j = 0;
+        // unroll de 4 em 4
+        for (; j + 3 < c-1; j += 4) {
+            if (row0[j]   > maior_custo_reduzido) { maior_custo_reduzido = row0[j];   col_pivo = j;   }
+            if (row0[j+1] > maior_custo_reduzido) { maior_custo_reduzido = row0[j+1]; col_pivo = j+1; }
+            if (row0[j+2] > maior_custo_reduzido) { maior_custo_reduzido = row0[j+2]; col_pivo = j+2; }
+            if (row0[j+3] > maior_custo_reduzido) { maior_custo_reduzido = row0[j+3]; col_pivo = j+3; }
+        }
+        for (; j < c-1; j++) {
+            if (row0[j] > maior_custo_reduzido) {
+                maior_custo_reduzido = row0[j];
                 col_pivo = j;
             }
         }
         if (col_pivo == -1) break; // Ótimo
 
 
-        // 2. Definir Linha Pivô
+        // 2. Definir Linha Pivô (ponteiro para cada linha)
         int lin_pivo = -1;
         double menor_divisao = 1e20;
         for (int i = 1; i < l; i++) {
-            double aij = tableau(i, col_pivo);
-            double bi  = tableau(i, c-1);
-            
-            if (aij > 0 && bi >= 0) {
+            double *rowi = &tableau(i, 0);
+            double aij = rowi[col_pivo];
+            double bi = rowi[c-1];
+            if (aij > 0.0 && bi >= 0.0) {
                 double razao = bi / aij;
                 if (razao < menor_divisao) {
                     menor_divisao = razao;
@@ -162,42 +170,47 @@ int main() {
             pivo_row[k] = pivo_row[k] * inv_piv;
         }
 
-        // Elimina a coluna pivô em duas fases, sem ter que verificar i != lin_pivo
-        // e desenrolando os loops de dentro de 4 em 4
+        // Elimina a coluna pivô em duas fases, sem branch em i
+        // e usando ponteiros de linha para remover cálculo de índices
 
         // fase 1: i = 0 … lin_pivo-1
         for (int i = 0; i < lin_pivo; i++) {
-            double f = tableau(i, col_pivo);
+            double *row_i = &tableau(i, 0);
+            double f = row_i[col_pivo];
             int j = 0;
+            // unroll de 4 em 4
             for (; j + 3 < c; j += 4) {
-                tableau(i,   j) -= f * pivo_row[j];
-                tableau(i, j+1) -= f * pivo_row[j+1];
-                tableau(i, j+2) -= f * pivo_row[j+2];
-                tableau(i, j+3) -= f * pivo_row[j+3];
+                row_i[j]   -= f * pivo_row[j];
+                row_i[j+1] -= f * pivo_row[j+1];
+                row_i[j+2] -= f * pivo_row[j+2];
+                row_i[j+3] -= f * pivo_row[j+3];
             }
             for (; j < c; j++) {
-                tableau(i, j) -= f * pivo_row[j];
+                row_i[j] -= f * pivo_row[j];
             }
         }
 
         // fase 2: i = lin_pivo+1 … l-1
         for (int i = lin_pivo + 1; i < l; i++) {
-            double f = tableau(i, col_pivo);
+            double *row_i = &tableau(i, 0);
+            double f = row_i[col_pivo];
             int j = 0;
+            // unroll de 4 em 4
             for (; j + 3 < c; j += 4) {
-                tableau(i,   j) -= f * pivo_row[j];
-                tableau(i, j+1) -= f * pivo_row[j+1];
-                tableau(i, j+2) -= f * pivo_row[j+2];
-                tableau(i, j+3) -= f * pivo_row[j+3];
+                row_i[j]   -= f * pivo_row[j];
+                row_i[j+1] -= f * pivo_row[j+1];
+                row_i[j+2] -= f * pivo_row[j+2];
+                row_i[j+3] -= f * pivo_row[j+3];
             }
             for (; j < c; j++) {
-                tableau(i, j) -= f * pivo_row[j];
+                row_i[j] -= f * pivo_row[j];
             }
         }
 
 
     }
 
+    // Verificação de viabilidade ao final da execução do Simplex
     bool inviavel = false;
     for (int i = 0; i < n; i++) {
         if (variaveis_base[i] >= m && variaveis_base[i] < c-1) {
